@@ -12,6 +12,7 @@ import * as bcrypt from 'bcrypt';
 import { SignUpResposneDto } from './dto/res/signupres.dto';
 import { SignInRequestDto } from './dto/req/signin.req.dto';
 import { JwtService } from '@nestjs/jwt';
+import { Payload } from './security/payload.interface';
 
 @Injectable()
 export class UserService {
@@ -76,10 +77,16 @@ export class UserService {
       throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
     }
 
-    const payload = { userName: findUser.userName };
+    const payload: Payload = { userName: findUser.userName };
 
     return {
       accessToken: this.jwtService.sign(payload),
     };
+  }
+
+  async tokenValidateUser(payload: Payload): Promise<User | undefined> {
+    return await this.userRepository.findOne({
+      where: { userName: payload.userName },
+    });
   }
 }
