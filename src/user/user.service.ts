@@ -1,15 +1,23 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { SignUpRequestDto } from './dto/signupreq.dto';
+import { SignUpRequestDto } from './dto/req/signupreq.dto';
 import { User } from './entity/user.entity';
 import * as bcrypt from 'bcrypt';
-import { SignUpResposneDto } from './dto/signupres.dto';
+import { SignUpResposneDto } from './dto/res/signupres.dto';
+import { SignInRequestDto } from './dto/req/signin.req.dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async signUp(signUpDto: SignUpRequestDto): Promise<SignUpResposneDto> {
@@ -48,6 +56,30 @@ export class UserService {
     return {
       email: saveUser.email,
       userName: saveUser.userName,
+    };
+  }
+
+  async signIn(signInDto: SignInRequestDto): Promise<{ accessToken: string }> {
+    const { email, password } = signInDto;
+
+    const findUser: User = await this.userRepository.findOne({
+      where: { email },
+    });
+
+    if (!findUser) {
+      throw new NotFoundException('존재하지 않는 유저입니다.');
+    }
+
+    const isValidPassword = await bcrypt.compare(password, findUser.password);
+
+    if (!isValidPassword) {
+      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+    }
+
+    const payload = { userName: findUser.userName };
+
+    return {
+      accessToken: this.jwtService.sign(payload),
     };
   }
 }
