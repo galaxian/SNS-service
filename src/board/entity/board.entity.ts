@@ -1,3 +1,4 @@
+import { HashTag } from 'src/tag/entity/tag.entity';
 import { Thumb } from 'src/thumb/entity/thumb.entity';
 import { User } from 'src/user/entity/user.entity';
 import { TimeStampableEntity } from 'src/util/entity/timeStamp.entity';
@@ -20,12 +21,12 @@ export class Board extends TimeStampableEntity {
   @Column()
   content: string;
 
-  @Column()
-  hashTag: string;
-
   @OneToMany(() => Thumb, (thumb) => thumb.board, { eager: false })
   thumb: Thumb[];
 
   @ManyToOne(() => User, (user) => user.board, { eager: false })
   user: User;
+
+  @OneToMany(() => HashTag, (hashTag) => hashTag.board, { eager: false })
+  hashTag: HashTag[];
 }
