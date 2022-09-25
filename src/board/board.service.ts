@@ -5,10 +5,12 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { HashTag } from 'src/tag/entity/tag.entity';
 import { TagService } from 'src/tag/tag.service';
 import { User } from 'src/user/entity/user.entity';
 import { Repository } from 'typeorm';
 import { CreateBoardRequestDto } from './dto/req/createpost.req.dto';
+import { GetAllBoardResponseDto } from './dto/res/getpost.res.dto';
 import { Board } from './entity/board.entity';
 
 @Injectable()
@@ -49,5 +51,29 @@ export class BoardService {
     }
 
     return findBoard;
+  }
+
+  async getAllBoard(): Promise<GetAllBoardResponseDto[]> {
+    const allBoardList: Board[] = await this.boardRepository.find({
+      relations: ['user', 'hashTag'],
+    });
+
+    const result: GetAllBoardResponseDto[] = [];
+
+    allBoardList.forEach((board) => {
+      const tagList: string[] = [];
+      const tags: HashTag[] = board.hashTag;
+      tags.forEach((tag) => {
+        tagList.push(tag.tagName);
+      });
+      result.push({
+        title: board.title,
+        author: board.user.userName,
+        tagList,
+        createAt: board.createAt.toString(),
+      });
+    });
+
+    return result;
   }
 }

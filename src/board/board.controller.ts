@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Req,
   UseGuards,
@@ -28,6 +29,16 @@ export class BoardController {
     const data = await this.boardService.createBoard(createDto, user);
     return {
       status: 201,
+      data,
+    };
+  }
+
+  @Get()
+  @UsePipes(ValidationPipe)
+  async getAllBoard(): Promise<ResponseDto> {
+    const data = await this.boardService.getAllBoard();
+    return {
+      status: 200,
       data,
     };
   }
