@@ -10,6 +10,7 @@ import { TagService } from 'src/tag/tag.service';
 import { User } from 'src/user/entity/user.entity';
 import { Repository } from 'typeorm';
 import { CreateBoardRequestDto } from './dto/req/createpost.req.dto';
+import { GetDetailBoardResponseDto } from './dto/res/getdetailPost.res.dto';
 import { GetAllBoardResponseDto } from './dto/res/getpost.res.dto';
 import { Board } from './entity/board.entity';
 
@@ -75,5 +76,26 @@ export class BoardService {
     });
 
     return result;
+  }
+
+  async getDetailBoard(id: number): Promise<GetDetailBoardResponseDto> {
+    const findBoard: Board = await this.boardRepository.findOne({
+      where: { id },
+      relations: ['user', 'hashTag'],
+    });
+
+    const tagList: string[] = [];
+    const tags: HashTag[] = findBoard.hashTag;
+    tags.forEach((tag) => {
+      tagList.push(tag.tagName);
+    });
+
+    return {
+      title: findBoard.title,
+      content: findBoard.content,
+      author: findBoard.user.userName,
+      tagList,
+      createAt: findBoard.createAt.toString(),
+    };
   }
 }
