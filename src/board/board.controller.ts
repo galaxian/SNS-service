@@ -45,9 +45,13 @@ export class BoardController {
   @UsePipes(ValidationPipe)
   async getAllBoard(
     @Query('search', new DefaultValuePipe('')) search: string,
+    @Query('page', new DefaultValuePipe(1)) page: number,
+    @Query('pagesize', new DefaultValuePipe(10)) pageSize: number,
   ): Promise<ResponseDto> {
     const data: GetAllBoardResponseDto[] = await this.boardService.getAllBoard(
       search,
+      page,
+      pageSize,
     );
     return {
       status: 200,
