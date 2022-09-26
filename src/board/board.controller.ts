@@ -1,12 +1,14 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
   ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
   UsePipes,
@@ -41,9 +43,20 @@ export class BoardController {
 
   @Get()
   @UsePipes(ValidationPipe)
-  async getAllBoard(): Promise<ResponseDto> {
-    const data: GetAllBoardResponseDto[] =
-      await this.boardService.getAllBoard();
+  async getAllBoard(
+    @Query('search', new DefaultValuePipe('')) search: string,
+    @Query('page', new DefaultValuePipe(1)) page: number,
+    @Query('pagesize', new DefaultValuePipe(10)) pageSize: number,
+    @Query('orderby', new DefaultValuePipe('DESC')) orderBy: string,
+    @Query('option', new DefaultValuePipe('createAt')) orderOption: string,
+  ): Promise<ResponseDto> {
+    const data: GetAllBoardResponseDto[] = await this.boardService.getAllBoard(
+      search,
+      page,
+      pageSize,
+      orderBy,
+      orderOption,
+    );
     return {
       status: 200,
       data,
@@ -102,6 +115,21 @@ export class BoardController {
   ): Promise<ResponseDto> {
     const user: any = req.user;
     const data = await this.boardService.restoreBoard(id, user);
+    return {
+      status: 200,
+      data,
+    };
+  }
+
+  @Put('/:id/thumbs')
+  @UsePipes(ValidationPipe)
+  @UseGuards(AuthGuard)
+  async thumbUpOrDown(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request,
+  ): Promise<ResponseDto> {
+    const user: any = req.user;
+    const data = await this.boardService.thumbUpOrDown(id, user);
     return {
       status: 200,
       data,

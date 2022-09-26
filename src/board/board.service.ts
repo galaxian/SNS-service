@@ -8,6 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashTag } from 'src/tag/entity/tag.entity';
 import { TagService } from 'src/tag/tag.service';
+import { ThumbService } from 'src/thumb/thumb.service';
 import { User } from 'src/user/entity/user.entity';
 import { Repository } from 'typeorm';
 import { CreateBoardRequestDto } from './dto/req/createpost.req.dto';
@@ -22,6 +23,7 @@ export class BoardService {
     private readonly boardRepository: Repository<Board>,
     @Inject(forwardRef(() => TagService))
     private readonly tagService: TagService,
+    private readonly thumbService: ThumbService,
   ) {}
 
   async createBoard(
@@ -55,10 +57,30 @@ export class BoardService {
     return findBoard;
   }
 
-  async getAllBoard(): Promise<GetAllBoardResponseDto[]> {
-    const allBoardList: Board[] = await this.boardRepository.find({
-      relations: ['user', 'hashTag'],
-    });
+  async getAllBoard(
+    search: string,
+    page: number,
+    pageSize: number,
+    orderBy: string,
+    orderOption: string,
+  ): Promise<GetAllBoardResponseDto[]> {
+    const skip = (page - 1) * pageSize;
+    const allBoardList: Board[] = await this.boardRepository
+      .createQueryBuilder('board')
+      .innerJoinAndSelect('board.hashTag', 'hashTag')
+      .innerJoinAndSelect('board.user', 'user')
+      .where('board.title like :search', { search: `%${search}%` })
+      .orderBy(
+        orderOption === 'thumb'
+          ? 'board.countThumbUp'
+          : orderOption === 'views'
+          ? 'board.views'
+          : 'board.createAt',
+        orderBy === 'ASC' ? 'ASC' : 'DESC',
+      )
+      .skip(skip)
+      .take(pageSize)
+      .getMany();
 
     const result: GetAllBoardResponseDto[] = [];
 
@@ -69,9 +91,12 @@ export class BoardService {
         tagList.push(tag.tagName);
       });
       result.push({
+        id: board.id,
         title: board.title,
         author: board.user.userName,
         tagList,
+        countThumb: board.countThumbUp,
+        views: board.views,
         createAt: board.createAt.toString(),
       });
     });
@@ -91,12 +116,19 @@ export class BoardService {
       tagList.push(tag.tagName);
     });
 
+    findBoard.views += 1;
+
+    const saveBoard: Board = await this.boardRepository.save(findBoard);
+
     return {
-      title: findBoard.title,
-      content: findBoard.content,
-      author: findBoard.user.userName,
+      id: saveBoard.id,
+      title: saveBoard.title,
+      content: saveBoard.content,
+      author: saveBoard.user.userName,
       tagList,
-      createAt: findBoard.createAt.toString(),
+      countThumb: saveBoard.countThumbUp,
+      views: saveBoard.views,
+      createAt: saveBoard.createAt.toString(),
     };
   }
 
@@ -176,6 +208,27 @@ export class BoardService {
 
     return {
       id: findSoftDeleteBoard.id,
+    };
+  }
+
+  async thumbUpOrDown(id: number, user: any): Promise<{ isThumb: boolean }> {
+    const findBoard: Board = await this.findBoardById(id);
+
+    const isThumb: boolean = await this.thumbService.thumbUpOrDown(
+      findBoard,
+      user,
+    );
+
+    const countThumbUp: number = await this.thumbService.countThumb(
+      findBoard.id,
+    );
+
+    findBoard.countThumbUp = countThumbUp;
+
+    await this.boardRepository.save(findBoard);
+
+    return {
+      isThumb,
     };
   }
 }
