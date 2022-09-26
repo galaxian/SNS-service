@@ -142,6 +142,8 @@ export class BoardService {
       throw new UnauthorizedException('본인 게시글만 삭제 할 수 있습니다.');
     }
 
+    await this.tagService.softDelteTag(id);
+
     const result = await this.boardRepository.softDelete(id);
 
     if (result.affected === 0) {
