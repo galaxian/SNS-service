@@ -21,6 +21,9 @@ export class Board extends TimeStampableEntity {
   @Column()
   content: string;
 
+  @Column({ default: 0 })
+  countThumbUp: number;
+
   @OneToMany(() => Thumb, (thumb) => thumb.board, { eager: false })
   thumb: Thumb[];
 
