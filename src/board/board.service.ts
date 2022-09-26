@@ -91,6 +91,7 @@ export class BoardService {
         tagList.push(tag.tagName);
       });
       result.push({
+        id: board.id,
         title: board.title,
         author: board.user.userName,
         tagList,
@@ -120,6 +121,7 @@ export class BoardService {
     const saveBoard: Board = await this.boardRepository.save(findBoard);
 
     return {
+      id: saveBoard.id,
       title: saveBoard.title,
       content: saveBoard.content,
       author: saveBoard.user.userName,

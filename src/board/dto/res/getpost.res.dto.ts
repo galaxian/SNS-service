@@ -1,4 +1,5 @@
 export class GetAllBoardResponseDto {
+  id: number;
   title: string;
   author: string;
   tagList: string[];
