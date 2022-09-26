@@ -71,7 +71,11 @@ export class BoardService {
       .innerJoinAndSelect('board.user', 'user')
       .where('board.title like :search', { search: `%${search}%` })
       .orderBy(
-        orderOption === 'thumb' ? 'board.countThumbUp' : 'board.createAt',
+        orderOption === 'thumb'
+          ? 'board.countThumbUp'
+          : orderOption === 'views'
+          ? 'board.views'
+          : 'board.createAt',
         orderBy === 'ASC' ? 'ASC' : 'DESC',
       )
       .skip(skip)
