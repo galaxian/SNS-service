@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
   UsePipes,
@@ -41,9 +42,10 @@ export class BoardController {
 
   @Get()
   @UsePipes(ValidationPipe)
-  async getAllBoard(): Promise<ResponseDto> {
-    const data: GetAllBoardResponseDto[] =
-      await this.boardService.getAllBoard();
+  async getAllBoard(@Query('search') search: string): Promise<ResponseDto> {
+    const data: GetAllBoardResponseDto[] = await this.boardService.getAllBoard(
+      search,
+    );
     return {
       status: 200,
       data,

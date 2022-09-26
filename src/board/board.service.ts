@@ -55,10 +55,13 @@ export class BoardService {
     return findBoard;
   }
 
-  async getAllBoard(): Promise<GetAllBoardResponseDto[]> {
-    const allBoardList: Board[] = await this.boardRepository.find({
-      relations: ['user', 'hashTag'],
-    });
+  async getAllBoard(search: string): Promise<GetAllBoardResponseDto[]> {
+    const allBoardList: Board[] = await this.boardRepository
+      .createQueryBuilder('board')
+      .innerJoinAndSelect('board.hashTag', 'hashTag')
+      .innerJoinAndSelect('board.user', 'user')
+      .where('board.title like :search', { search: `%${search}%` })
+      .getMany();
 
     const result: GetAllBoardResponseDto[] = [];
 
