@@ -25,4 +25,26 @@ export class TagService {
       await this.tagRepository.save(hashTag);
     });
   }
+
+  async updateTag(id: number, hashTag: string) {
+    const findTagList = await this.findTagListByBoardId(id);
+
+    await this.deleteTag(findTagList);
+
+    await this.saveTag(id, hashTag);
+  }
+
+  async deleteTag(findTagList: HashTag[]) {
+    findTagList.forEach(async (tag) => {
+      await this.tagRepository.delete(tag.id);
+    });
+  }
+
+  async findTagListByBoardId(boardId: number): Promise<HashTag[]> {
+    const findTagList = await this.tagRepository.find({
+      where: { board: { id: boardId } },
+    });
+
+    return findTagList;
+  }
 }

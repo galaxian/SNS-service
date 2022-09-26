@@ -120,7 +120,7 @@ export class BoardService {
 
     const { title, content, hashTag } = updateDto;
 
-    // await this.tagService.updateTag(id, hashTag);
+    await this.tagService.updateTag(id, hashTag);
 
     findBoard.content = content;
     findBoard.title = title;
