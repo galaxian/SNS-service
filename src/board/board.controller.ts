@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   Param,
@@ -42,7 +43,9 @@ export class BoardController {
 
   @Get()
   @UsePipes(ValidationPipe)
-  async getAllBoard(@Query('search') search: string): Promise<ResponseDto> {
+  async getAllBoard(
+    @Query('search', new DefaultValuePipe('')) search: string,
+  ): Promise<ResponseDto> {
     const data: GetAllBoardResponseDto[] = await this.boardService.getAllBoard(
       search,
     );
