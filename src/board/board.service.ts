@@ -150,4 +150,30 @@ export class BoardService {
       throw new NotFoundException('게시글이 존재하지 않습니다.');
     }
   }
+
+  async restoreBoard(id: number, user: any): Promise<{ id: number }> {
+    const findSoftDeleteBoard: Board = await this.boardRepository.findOne({
+      where: { id },
+      relations: ['user'],
+      withDeleted: true,
+    });
+
+    if (!findSoftDeleteBoard) {
+      throw new NotFoundException('존재하지 않는 게시글입니다.');
+    }
+
+    if (findSoftDeleteBoard.user.id !== user.id) {
+      throw new UnauthorizedException('본인의 게시글만 복구할 수 있습니다.');
+    }
+
+    const result = await this.boardRepository.restore(id);
+
+    if (!result.affected) {
+      throw new NotFoundException('존재하지 않는 게시글입니다.');
+    }
+
+    return {
+      id: findSoftDeleteBoard.id,
+    };
+  }
 }

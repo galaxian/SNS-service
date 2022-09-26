@@ -92,4 +92,19 @@ export class BoardController {
       status: 200,
     };
   }
+
+  @Put('/restore/:id')
+  @UsePipes(ValidationPipe)
+  @UseGuards(AuthGuard)
+  async restoreBoard(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request,
+  ): Promise<ResponseDto> {
+    const user: any = req.user;
+    const data = await this.boardService.restoreBoard(id, user);
+    return {
+      status: 200,
+      data,
+    };
+  }
 }
