@@ -35,4 +35,8 @@ export class ThumbService {
     await this.thumbRepository.save(thumb);
     return thumb.isThumb;
   }
+
+  async countThumb(id: number): Promise<number> {
+    return await this.thumbRepository.countBy({ board: { id }, isThumb: true });
+  }
 }

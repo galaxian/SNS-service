@@ -87,6 +87,7 @@ export class BoardService {
         title: board.title,
         author: board.user.userName,
         tagList,
+        countThumb: board.countThumbUp,
         createAt: board.createAt.toString(),
       });
     });
@@ -111,6 +112,7 @@ export class BoardService {
       content: findBoard.content,
       author: findBoard.user.userName,
       tagList,
+      countThumb: findBoard.countThumbUp,
       createAt: findBoard.createAt.toString(),
     };
   }
@@ -201,6 +203,14 @@ export class BoardService {
       findBoard,
       user,
     );
+
+    const countThumbUp: number = await this.thumbService.countThumb(
+      findBoard.id,
+    );
+
+    findBoard.countThumbUp = countThumbUp;
+
+    await this.boardRepository.save(findBoard);
 
     return {
       isThumb,
