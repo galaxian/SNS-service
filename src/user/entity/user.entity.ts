@@ -1,3 +1,4 @@
+import { Board } from 'src/board/entity/board.entity';
 import { Thumb } from 'src/thumb/entity/thumb.entity';
 import { TimeStampableEntity } from 'src/util/entity/timeStamp.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -18,4 +19,7 @@ export class User extends TimeStampableEntity {
 
   @OneToMany(() => Thumb, (thumb) => thumb.user, { eager: false })
   thumb: Thumb[];
+
+  @OneToMany(() => Board, (board) => board.user, { eager: false })
+  board: Board;
 }
