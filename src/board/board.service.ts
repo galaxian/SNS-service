@@ -8,6 +8,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashTag } from 'src/tag/entity/tag.entity';
 import { TagService } from 'src/tag/tag.service';
+import { ThumbService } from 'src/thumb/thumb.service';
 import { User } from 'src/user/entity/user.entity';
 import { Repository } from 'typeorm';
 import { CreateBoardRequestDto } from './dto/req/createpost.req.dto';
@@ -22,6 +23,7 @@ export class BoardService {
     private readonly boardRepository: Repository<Board>,
     @Inject(forwardRef(() => TagService))
     private readonly tagService: TagService,
+    private readonly thumbService: ThumbService,
   ) {}
 
   async createBoard(
@@ -189,6 +191,19 @@ export class BoardService {
 
     return {
       id: findSoftDeleteBoard.id,
+    };
+  }
+
+  async thumbUpOrDown(id: number, user: any): Promise<{ isThumb: boolean }> {
+    const findBoard: Board = await this.findBoardById(id);
+
+    const isThumb: boolean = await this.thumbService.thumbUpOrDown(
+      findBoard,
+      user,
+    );
+
+    return {
+      isThumb,
     };
   }
 }

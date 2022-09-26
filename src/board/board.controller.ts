@@ -120,4 +120,19 @@ export class BoardController {
       data,
     };
   }
+
+  @Put('/:id/thumbs')
+  @UsePipes(ValidationPipe)
+  @UseGuards(AuthGuard)
+  async thumbUpOrDown(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request,
+  ): Promise<ResponseDto> {
+    const user: any = req.user;
+    const data = await this.boardService.thumbUpOrDown(id, user);
+    return {
+      status: 200,
+      data,
+    };
+  }
 }
