@@ -5,6 +5,7 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  Put,
   Req,
   UseGuards,
   UsePipes,
@@ -55,6 +56,22 @@ export class BoardController {
   ): Promise<ResponseDto> {
     const data: GetDetailBoardResponseDto =
       await this.boardService.getDetailBoard(id);
+    return {
+      status: 200,
+      data,
+    };
+  }
+
+  @Put('/:id')
+  @UsePipes(ValidationPipe)
+  @UseGuards(AuthGuard)
+  async updateBoard(
+    @Param('id') id: number,
+    @Body() updateDto: CreateBoardRequestDto,
+    @Req() req: Request,
+  ) {
+    const user: any = req.user;
+    const data = await this.boardService.updateBoard(id, updateDto, user);
     return {
       status: 200,
       data,

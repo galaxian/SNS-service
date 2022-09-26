@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HashTag } from 'src/tag/entity/tag.entity';
@@ -96,6 +97,38 @@ export class BoardService {
       author: findBoard.user.userName,
       tagList,
       createAt: findBoard.createAt.toString(),
+    };
+  }
+
+  async updateBoard(
+    id: number,
+    updateDto: CreateBoardRequestDto,
+    user: User,
+  ): Promise<{ id: number }> {
+    const findBoard: Board = await this.boardRepository.findOne({
+      where: { id },
+      relations: ['user', 'hashTag'],
+    });
+
+    if (!findBoard) {
+      throw new NotFoundException('존재하지 않는 게시글입니다.');
+    }
+
+    if (findBoard.user.id !== user.id) {
+      throw new UnauthorizedException('본인 게시글만 수정 할 수 있습니다.');
+    }
+
+    const { title, content, hashTag } = updateDto;
+
+    // await this.tagService.updateTag(id, hashTag);
+
+    findBoard.content = content;
+    findBoard.title = title;
+
+    const updateBoard: Board = await this.boardRepository.save(findBoard);
+
+    return {
+      id: updateBoard.id,
     };
   }
 }
