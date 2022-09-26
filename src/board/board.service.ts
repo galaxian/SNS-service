@@ -59,6 +59,8 @@ export class BoardService {
     search: string,
     page: number,
     pageSize: number,
+    orderBy: string,
+    orderOption: string,
   ): Promise<GetAllBoardResponseDto[]> {
     const skip = (page - 1) * pageSize;
     const allBoardList: Board[] = await this.boardRepository
@@ -66,6 +68,7 @@ export class BoardService {
       .innerJoinAndSelect('board.hashTag', 'hashTag')
       .innerJoinAndSelect('board.user', 'user')
       .where('board.title like :search', { search: `%${search}%` })
+      .orderBy('board.createAt', orderBy === 'ASC' ? 'ASC' : 'DESC')
       .skip(skip)
       .take(pageSize)
       .getMany();

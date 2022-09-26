@@ -47,11 +47,15 @@ export class BoardController {
     @Query('search', new DefaultValuePipe('')) search: string,
     @Query('page', new DefaultValuePipe(1)) page: number,
     @Query('pagesize', new DefaultValuePipe(10)) pageSize: number,
+    @Query('orderby', new DefaultValuePipe('DESC')) orderBy: string,
+    @Query('option', new DefaultValuePipe('createAt')) orderOption: string,
   ): Promise<ResponseDto> {
     const data: GetAllBoardResponseDto[] = await this.boardService.getAllBoard(
       search,
       page,
       pageSize,
+      orderBy,
+      orderOption,
     );
     return {
       status: 200,
