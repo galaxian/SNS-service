@@ -70,7 +70,10 @@ export class BoardService {
       .innerJoinAndSelect('board.hashTag', 'hashTag')
       .innerJoinAndSelect('board.user', 'user')
       .where('board.title like :search', { search: `%${search}%` })
-      .orderBy('board.createAt', orderBy === 'ASC' ? 'ASC' : 'DESC')
+      .orderBy(
+        orderOption === 'thumb' ? 'board.countThumbUp' : 'board.createAt',
+        orderBy === 'ASC' ? 'ASC' : 'DESC',
+      )
       .skip(skip)
       .take(pageSize)
       .getMany();
