@@ -91,6 +91,7 @@ export class BoardService {
         author: board.user.userName,
         tagList,
         countThumb: board.countThumbUp,
+        views: board.views,
         createAt: board.createAt.toString(),
       });
     });
@@ -110,13 +111,18 @@ export class BoardService {
       tagList.push(tag.tagName);
     });
 
+    findBoard.views += 1;
+
+    const saveBoard: Board = await this.boardRepository.save(findBoard);
+
     return {
-      title: findBoard.title,
-      content: findBoard.content,
-      author: findBoard.user.userName,
+      title: saveBoard.title,
+      content: saveBoard.content,
+      author: saveBoard.user.userName,
       tagList,
-      countThumb: findBoard.countThumbUp,
-      createAt: findBoard.createAt.toString(),
+      countThumb: saveBoard.countThumbUp,
+      views: saveBoard.views,
+      createAt: saveBoard.createAt.toString(),
     };
   }
 
