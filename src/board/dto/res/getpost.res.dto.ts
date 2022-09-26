@@ -3,5 +3,6 @@ export class GetAllBoardResponseDto {
   author: string;
   tagList: string[];
   countThumb: number;
+  views: number;
   createAt: string;
 }
