@@ -51,4 +51,8 @@ export class TagService {
   async softDelteTag(id: number) {
     await this.tagRepository.softDelete({ board: { id } });
   }
+
+  async restoreTag(id: number) {
+    await this.tagRepository.restore({ board: { id } });
+  }
 }
