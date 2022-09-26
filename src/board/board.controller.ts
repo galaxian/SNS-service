@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -66,7 +67,7 @@ export class BoardController {
   @UsePipes(ValidationPipe)
   @UseGuards(AuthGuard)
   async updateBoard(
-    @Param('id') id: number,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateDto: CreateBoardRequestDto,
     @Req() req: Request,
   ) {
@@ -75,6 +76,20 @@ export class BoardController {
     return {
       status: 200,
       data,
+    };
+  }
+
+  @Delete('/:id')
+  @UsePipes(ValidationPipe)
+  @UseGuards(AuthGuard)
+  async softDeleteBoard(
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: Request,
+  ): Promise<ResponseDto> {
+    const user: any = req.user;
+    await this.boardService.softDeleteBoard(id, user);
+    return {
+      status: 200,
     };
   }
 }
