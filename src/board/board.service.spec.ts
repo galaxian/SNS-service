@@ -312,5 +312,43 @@ describe('BoardService', () => {
         updateDto.hashTag,
       );
     });
+    it('게시글 NotFound', async () => {
+      //given
+      const boardId = 1;
+      const updateDto: CreateBoardRequestDto = {
+        title: '제목 수정',
+        content: '내용 수정',
+      };
+
+      const user: User = {
+        id: 1,
+        email: '',
+        userName: '',
+        password: '',
+        thumb: [],
+        board: new Board(),
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      mockBoardRepository.findOne.mockReturnValue(null);
+
+      //when
+
+      //then
+      expect(async () => {
+        await boardService.updateBoard(boardId, updateDto, user);
+      }).rejects.toThrowError(
+        new NotFoundException('존재하지 않는 게시글입니다.'),
+      );
+      expect(mockBoardRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockBoardRepository.findOne).toHaveBeenCalledWith({
+        where: { id: boardId },
+        relations: ['user', 'hashTag'],
+      });
+      expect(mockBoardRepository.save).toHaveBeenCalledTimes(0);
+      expect(mockTagService.updateTag).toHaveBeenCalledTimes(0);
+    });
   });
 });
