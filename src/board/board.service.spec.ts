@@ -24,6 +24,7 @@ describe('BoardService', () => {
     saveTag: jest.fn(),
     updateTag: jest.fn(),
     softDeleteTag: jest.fn(),
+    restoreTag: jest.fn(),
   };
 
   const mockThumbService = {};
@@ -562,6 +563,62 @@ describe('BoardService', () => {
       });
       expect(mockTagService.softDeleteTag).toHaveBeenCalledTimes(0);
       expect(mockBoardRepository.softDelete).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  describe('restoreBoard', () => {
+    it('게시글 복구 성공', async () => {
+      //given
+      const boardId = 1;
+
+      const user: User = {
+        id: 1,
+        email: '',
+        userName: '',
+        password: '',
+        thumb: [],
+        board: new Board(),
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      const findBoard: Board = {
+        id: 1,
+        title: '',
+        content: '',
+        countThumbUp: 0,
+        views: 0,
+        thumb: [],
+        user: user,
+        hashTag: [],
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: new Date(),
+      };
+
+      const restoreBoard: Board = findBoard;
+      restoreBoard.deleteAt = null;
+
+      mockBoardRepository.findOne.mockReturnValue(findBoard);
+      mockBoardRepository.restore.mockReturnValue({ affected: 1 });
+      mockTagService.restoreTag.mockReturnValue(undefined);
+
+      //when
+      const result = await boardService.restoreBoard(boardId, user);
+
+      //then
+      expect(result.id).toEqual(boardId);
+      expect(mockBoardRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockBoardRepository.findOne).toHaveBeenCalledWith({
+        where: { id: boardId },
+        relations: ['user'],
+        withDeleted: true,
+      });
+      expect(mockBoardRepository.restore).toHaveBeenCalledTimes(1);
+      expect(mockBoardRepository.restore).toHaveBeenCalledWith(boardId);
+      expect(mockTagService.restoreTag).toHaveBeenCalledTimes(1);
+      expect(mockTagService.restoreTag).toHaveBeenCalledWith(boardId);
     });
   });
 });
