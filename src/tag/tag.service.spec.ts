@@ -129,5 +129,22 @@ describe('TagService', () => {
       expect(mockTagRepository.save).toHaveBeenLastCalledWith(tag2);
       expect(result).toBeUndefined();
     });
+    it('게시글 없음', async () => {
+      //given
+      const boardId = 1;
+      const tagStrings = '#태그,#해시';
+
+      mockBoardService.findBoardById.mockRejectedValue(new NotFoundException());
+
+      //when
+
+      //then
+      expect(async () => {
+        await tagService.saveTag(boardId, tagStrings);
+      }).rejects.toThrowError(new NotFoundException());
+      expect(mockBoardService.findBoardById).toHaveBeenCalledTimes(1);
+      expect(mockTagRepository.create).toHaveBeenCalledTimes(0);
+      expect(mockTagRepository.save).toHaveBeenCalledTimes(0);
+    });
   });
 });
