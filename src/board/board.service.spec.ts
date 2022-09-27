@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { TagService } from 'src/tag/tag.service';
@@ -341,6 +341,71 @@ describe('BoardService', () => {
         await boardService.updateBoard(boardId, updateDto, user);
       }).rejects.toThrowError(
         new NotFoundException('존재하지 않는 게시글입니다.'),
+      );
+      expect(mockBoardRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockBoardRepository.findOne).toHaveBeenCalledWith({
+        where: { id: boardId },
+        relations: ['user', 'hashTag'],
+      });
+      expect(mockBoardRepository.save).toHaveBeenCalledTimes(0);
+      expect(mockTagService.updateTag).toHaveBeenCalledTimes(0);
+    });
+    it('타인 게시글 수정 실패', async () => {
+      //given
+      const boardId = 1;
+      const now = new Date();
+      const updateDto: CreateBoardRequestDto = {
+        title: '제목 수정',
+        content: '내용 수정',
+      };
+
+      const user: User = {
+        id: 1,
+        email: '',
+        userName: '',
+        password: '',
+        thumb: [],
+        board: new Board(),
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      const anotherUser: User = {
+        id: 2,
+        email: '',
+        userName: '',
+        password: '',
+        thumb: [],
+        board: new Board(),
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      const findBoard: Board = {
+        id: boardId,
+        title: '',
+        content: '',
+        countThumbUp: 0,
+        views: 0,
+        thumb: [],
+        user: anotherUser,
+        hashTag: [],
+        createAt: now,
+        updateAt: now,
+        deleteAt: undefined,
+      };
+
+      mockBoardRepository.findOne.mockReturnValue(findBoard);
+
+      //when
+
+      //then
+      expect(async () => {
+        await boardService.updateBoard(boardId, updateDto, user);
+      }).rejects.toThrowError(
+        new UnauthorizedException('본인 게시글만 수정 할 수 있습니다.'),
       );
       expect(mockBoardRepository.findOne).toHaveBeenCalledTimes(1);
       expect(mockBoardRepository.findOne).toHaveBeenCalledWith({
