@@ -122,5 +122,27 @@ describe('ThumbService', () => {
       expect(mockThumbRepository.save).toHaveBeenCalledTimes(1);
       expect(mockThumbRepository.save).toHaveBeenCalledWith(thumb);
     });
+    it('좋아요 증가', async () => {
+      //given
+      const thumb: Thumb = {
+        id: 1,
+        user: new User(),
+        board: new Board(),
+        isThumb: false,
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      mockThumbRepository.save.mockReturnValue(thumb);
+
+      //when
+      const result: boolean = await thumbService.thumbChange(thumb);
+
+      //then
+      expect(result).toBeTruthy();
+      expect(mockThumbRepository.save).toHaveBeenCalledTimes(1);
+      expect(mockThumbRepository.save).toHaveBeenCalledWith(thumb);
+    });
   });
 });
