@@ -112,6 +112,10 @@ export class BoardService {
       relations: ['user', 'hashTag'],
     });
 
+    if (!findBoard) {
+      throw new NotFoundException('존재하지 않는 게시글입니다.');
+    }
+
     const tagList: string[] = [];
     const tags: HashTag[] = findBoard.hashTag;
     tags.forEach((tag) => {
