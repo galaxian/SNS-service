@@ -5,6 +5,7 @@ import { ThumbService } from 'src/thumb/thumb.service';
 import { User } from 'src/user/entity/user.entity';
 import { BoardService } from './board.service';
 import { CreateBoardRequestDto } from './dto/req/createpost.req.dto';
+import { GetDetailBoardResponseDto } from './dto/res/getdetailPost.res.dto';
 import { Board } from './entity/board.entity';
 
 describe('BoardService', () => {
@@ -184,6 +185,48 @@ describe('BoardService', () => {
       expect(mockBoardRepository.save).toHaveBeenCalledTimes(1);
       expect(mockBoardRepository.save).toHaveBeenCalledWith(createBoard);
       expect(mockTagService.saveTag).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  describe('getDetailBoard', () => {
+    it('게시글 상세 조회 성공', async () => {
+      //given
+      const boardId = 1;
+
+      const now = new Date();
+
+      const findBoard: Board = {
+        id: boardId,
+        title: '',
+        content: '',
+        countThumbUp: 0,
+        views: 0,
+        thumb: [],
+        user: new User(),
+        hashTag: [],
+        createAt: now,
+        updateAt: now,
+        deleteAt: undefined,
+      };
+
+      mockBoardRepository.findOne.mockReturnValue(findBoard);
+      mockBoardRepository.save.mockResolvedValue(findBoard);
+
+      //when
+      const result: GetDetailBoardResponseDto =
+        await boardService.getDetailBoard(boardId);
+
+      //then
+      expect(result.id).toEqual(boardId);
+      expect(result.createAt).toEqual(now.toString());
+      expect(result.views).toEqual(findBoard.views);
+      expect(mockBoardRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockBoardRepository.findOne).toHaveBeenCalledWith({
+        where: { id: boardId },
+        relations: ['user', 'hashTag'],
+      });
+      expect(mockBoardRepository.save).toHaveBeenCalledTimes(1);
+      expect(mockBoardRepository.save).toHaveBeenCalledWith(findBoard);
     });
   });
 });
