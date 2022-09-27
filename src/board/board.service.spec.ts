@@ -503,5 +503,65 @@ describe('BoardService', () => {
       expect(mockTagService.softDeleteTag).toHaveBeenCalledTimes(0);
       expect(mockBoardRepository.softDelete).toHaveBeenCalledTimes(0);
     });
+    it('타인 게시글 삭제 실패', async () => {
+      //given
+      const boardId = 1;
+
+      const user: User = {
+        id: 1,
+        email: '',
+        userName: '',
+        password: '',
+        thumb: [],
+        board: new Board(),
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      const anotherUser: User = {
+        id: 2,
+        email: '',
+        userName: '',
+        password: '',
+        thumb: [],
+        board: new Board(),
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      const findBoard: Board = {
+        id: 1,
+        title: '',
+        content: '',
+        countThumbUp: 0,
+        views: 0,
+        thumb: [],
+        user: anotherUser,
+        hashTag: [],
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      mockBoardRepository.findOne.mockReturnValue(findBoard);
+
+      //when
+
+      //then
+      expect(async () => {
+        await boardService.softDeleteBoard(boardId, user);
+      }).rejects.toThrowError(
+        new UnauthorizedException('본인 게시글만 삭제 할 수 있습니다.'),
+      );
+      expect(mockBoardRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockBoardRepository.findOne).toHaveBeenCalledWith({
+        where: { id: boardId },
+        relations: ['user'],
+      });
+      expect(mockTagService.softDeleteTag).toHaveBeenCalledTimes(0);
+      expect(mockBoardRepository.softDelete).toHaveBeenCalledTimes(0);
+    });
   });
 });
