@@ -7,6 +7,7 @@ import { UserService } from './user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { BadRequestException } from '@nestjs/common';
+import { async } from 'rxjs';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -182,6 +183,38 @@ describe('UserService', () => {
           message: '이미 존재하는 닉네임입니다.',
         }),
       );
+      expect(mockUserRepository.create).toHaveBeenCalledTimes(0);
+      expect(mockUserRepository.save).toHaveBeenCalledTimes(0);
+    });
+    it('비밀번호, 비밀번호 확인 불일치', async () => {
+      //given
+      const input: SignUpRequestDto = {
+        email: 'abcd1234@gmail.com',
+        userName: 'hahahaha',
+        password: 'abcd1234>?',
+        checkPassword: 'sekdnfeee222',
+      };
+
+      mockUserRepository.findOne.mockImplementationOnce((email) => null);
+
+      mockUserRepository.findOne.mockImplementationOnce((userName) => null);
+
+      mockUserRepository.create.mockImplementation((input) => null);
+
+      mockUserRepository.save.mockImplementation((user) => null);
+
+      //when
+
+      //then
+      expect(async () => {
+        await userService.signUp(input);
+      }).rejects.toThrowError(
+        new BadRequestException({
+          statusCode: 400,
+          message: '비밀번호가 일치하지 않습니다.',
+        }),
+      );
+      expect(mockUserRepository.findOne).toHaveBeenCalledTimes(0);
       expect(mockUserRepository.create).toHaveBeenCalledTimes(0);
       expect(mockUserRepository.save).toHaveBeenCalledTimes(0);
     });
