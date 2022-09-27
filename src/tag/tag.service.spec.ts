@@ -248,4 +248,49 @@ describe('TagService', () => {
       expect(mockTagRepository.delete).toHaveBeenCalledTimes(tagList.length);
     });
   });
+
+  describe('updateTag', () => {
+    it('태그 수정', async () => {
+      //given
+      const boardId = 1;
+      const hashTag = '#해시,#태그';
+
+      const findTagList: HashTag[] = [
+        {
+          id: 1,
+          tagName: '태그',
+          board: new Board(),
+          createAt: undefined,
+          updateAt: undefined,
+          deleteAt: undefined,
+        },
+        {
+          id: 2,
+          tagName: '해시',
+          board: new Board(),
+          createAt: undefined,
+          updateAt: undefined,
+          deleteAt: undefined,
+        },
+      ];
+
+      const mockFindTagListByBoardId = jest
+        .spyOn(tagService, 'findTagListByBoardId')
+        .mockResolvedValue(findTagList);
+
+      const mockDeleteTag = jest
+        .spyOn(tagService, 'deleteTag')
+        .mockResolvedValue(undefined);
+
+      const mockSaveTag = jest
+        .spyOn(tagService, 'saveTag')
+        .mockResolvedValue(undefined);
+
+      //when
+      const result = await tagService.updateTag(boardId, hashTag);
+
+      //then
+      expect(result).toBeUndefined();
+    });
+  });
 });
