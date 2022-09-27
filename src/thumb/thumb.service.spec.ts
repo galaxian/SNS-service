@@ -98,4 +98,29 @@ describe('ThumbService', () => {
       expect(mockThumbRepository.save).toHaveBeenCalledWith(createThumb);
     });
   });
+
+  describe('thumbChange', () => {
+    it('좋아요 취소', async () => {
+      //given
+      const thumb: Thumb = {
+        id: 1,
+        user: new User(),
+        board: new Board(),
+        isThumb: true,
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      mockThumbRepository.save.mockReturnValue(thumb);
+
+      //when
+      const result: boolean = await thumbService.thumbChange(thumb);
+
+      //then
+      expect(result).toBeFalsy();
+      expect(mockThumbRepository.save).toHaveBeenCalledTimes(1);
+      expect(mockThumbRepository.save).toHaveBeenCalledWith(thumb);
+    });
+  });
 });
