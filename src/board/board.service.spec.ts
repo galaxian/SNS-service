@@ -1,3 +1,4 @@
+import { NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { TagService } from 'src/tag/tag.service';
@@ -227,6 +228,27 @@ describe('BoardService', () => {
       });
       expect(mockBoardRepository.save).toHaveBeenCalledTimes(1);
       expect(mockBoardRepository.save).toHaveBeenCalledWith(findBoard);
+    });
+    it('게시글 없음', async () => {
+      //given
+      const boardId = 1;
+
+      mockBoardRepository.findOne.mockReturnValue(null);
+
+      //when
+
+      //then
+      expect(async () => {
+        await boardService.getDetailBoard(boardId);
+      }).rejects.toThrowError(
+        new NotFoundException('존재하지 않는 게시글입니다.'),
+      );
+      expect(mockBoardRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockBoardRepository.findOne).toHaveBeenCalledWith({
+        where: { id: boardId },
+        relations: ['user', 'hashTag'],
+      });
+      expect(mockBoardRepository.save).toHaveBeenCalledTimes(0);
     });
   });
 });
