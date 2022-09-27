@@ -293,4 +293,23 @@ describe('TagService', () => {
       expect(result).toBeUndefined();
     });
   });
+
+  describe('softDeleteTag', () => {
+    it('태그 softDelete', async () => {
+      //given
+      const boardId = 1;
+
+      mockTagRepository.softDelete.mockReturnValue(undefined);
+
+      //when
+      const result = await tagService.softDelteTag(boardId);
+
+      //then
+      expect(result).toBeUndefined();
+      expect(mockTagRepository.softDelete).toHaveBeenCalledTimes(1);
+      expect(mockTagRepository.softDelete).toHaveBeenCalledWith({
+        board: { id: boardId },
+      });
+    });
+  });
 });
