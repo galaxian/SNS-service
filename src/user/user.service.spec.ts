@@ -6,7 +6,7 @@ import { User } from './entity/user.entity';
 import { UserService } from './user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { SignInRequestDto } from './dto/req/signin.req.dto';
 
 describe('UserService', () => {
@@ -242,7 +242,7 @@ describe('UserService', () => {
       //then
       expect(result.accessToken).toEqual(expect.any(String));
     });
-    it('로그인 가입 정보 없음', async () => {
+    it('로그인 비밀번호 불일치', async () => {
       //given
       const input: SignInRequestDto = {
         email: 'abcd1234@naver.com',
@@ -260,6 +260,42 @@ describe('UserService', () => {
         new BadRequestException({
           statusCode: 404,
           message: '존재하지 않는 유저입니다.',
+        }),
+      );
+    });
+    it('로그인 가입 정보 없음', async () => {
+      //given
+      const input: SignInRequestDto = {
+        email: 'abcd1234@naver.com',
+        password: 'abcd1234>?',
+      };
+
+      const findUser: User = {
+        id: 1,
+        email: 'abcd1234@gmail.com',
+        userName: 'hahahaha',
+        password: 'hashPassword',
+        thumb: [],
+        board: null,
+        createAt: new Date(),
+        updateAt: new Date(),
+        deleteAt: undefined,
+      };
+
+      mockUserRepository.findOne.mockImplementation((email) => findUser);
+
+      const bcryptCompare = jest.fn().mockResolvedValue(false);
+      (bcrypt.compare as jest.Mock) = bcryptCompare;
+
+      //when
+
+      //then
+      expect(async () => {
+        await userService.signIn(input);
+      }).rejects.toThrowError(
+        new UnauthorizedException({
+          statusCode: 401,
+          message: '비밀번호가 일치하지 않습니다.',
         }),
       );
     });
