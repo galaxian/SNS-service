@@ -22,6 +22,7 @@ describe('BoardService', () => {
 
   const mockTagService = {
     saveTag: jest.fn(),
+    updateTag: jest.fn(),
   };
 
   const mockThumbService = {};
@@ -43,6 +44,7 @@ describe('BoardService', () => {
     mockBoardRepository.restore.mockClear();
     mockBoardRepository.softDelete.mockClear();
     mockTagService.saveTag.mockClear();
+    mockTagService.updateTag.mockClear();
   });
 
   it('should be defined', () => {
@@ -249,6 +251,66 @@ describe('BoardService', () => {
         relations: ['user', 'hashTag'],
       });
       expect(mockBoardRepository.save).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  describe('updateBoard', () => {
+    it('게시글 수정 성공', async () => {
+      //given
+      const boardId = 1;
+      const updateDto: CreateBoardRequestDto = {
+        title: '제목 수정',
+        content: '내용 수정',
+      };
+      const create = new Date();
+
+      const user: User = {
+        id: 1,
+        email: '',
+        userName: '',
+        password: '',
+        thumb: [],
+        board: new Board(),
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      const findBoard: Board = {
+        id: 1,
+        title: '',
+        content: '',
+        countThumbUp: 0,
+        views: 0,
+        thumb: [],
+        user: user,
+        hashTag: [],
+        createAt: create,
+        updateAt: create,
+        deleteAt: undefined,
+      };
+
+      mockBoardRepository.findOne.mockReturnValue(findBoard);
+      mockBoardRepository.save.mockReturnValue(findBoard);
+      mockTagService.updateTag.mockReturnValue(undefined);
+
+      //when
+      const result = await boardService.updateBoard(boardId, updateDto, user);
+
+      //then
+      expect(result.id).toEqual(boardId);
+      expect(mockBoardRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockBoardRepository.findOne).toHaveBeenCalledWith({
+        where: { id: boardId },
+        relations: ['user', 'hashTag'],
+      });
+      expect(mockBoardRepository.save).toHaveBeenCalledTimes(1);
+      expect(mockBoardRepository.save).toHaveBeenCalledWith(findBoard);
+      expect(mockTagService.updateTag).toHaveBeenCalledTimes(1);
+      expect(mockTagService.updateTag).toHaveBeenCalledWith(
+        boardId,
+        updateDto.hashTag,
+      );
     });
   });
 });
