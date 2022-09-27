@@ -302,7 +302,7 @@ describe('TagService', () => {
       mockTagRepository.softDelete.mockReturnValue(undefined);
 
       //when
-      const result = await tagService.softDelteTag(boardId);
+      const result = await tagService.softDeleteTag(boardId);
 
       //then
       expect(result).toBeUndefined();
