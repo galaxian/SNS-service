@@ -40,7 +40,9 @@ export class BoardService {
 
     const saveBoard: Board = await this.boardRepository.save(board);
 
-    await this.tagService.saveTag(saveBoard.id, hashTag);
+    if (hashTag) {
+      await this.tagService.saveTag(saveBoard.id, hashTag);
+    }
 
     return { id: saveBoard.id };
   }
