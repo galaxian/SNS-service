@@ -8,6 +8,8 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { SignInRequestDto } from './dto/req/signin.req.dto';
+import { async } from 'rxjs';
+import { Payload } from './security/payload.interface';
 
 describe('UserService', () => {
   let userService: UserService;
@@ -33,6 +35,7 @@ describe('UserService', () => {
     }).compile();
 
     userService = module.get<UserService>(UserService);
+    jwtService = module.get<JwtService>(JwtService);
 
     mockUserRepository.create.mockClear();
     mockUserRepository.findOne.mockClear();
@@ -298,6 +301,36 @@ describe('UserService', () => {
           message: '비밀번호가 일치하지 않습니다.',
         }),
       );
+    });
+  });
+
+  describe('tokenvalidaeUser', () => {
+    it('payload에서 유저 조회', async () => {
+      //given
+      const payload: Payload = {
+        userName: 'hahaha',
+      };
+
+      const findUser: User = {
+        id: 1,
+        email: 'abcd1234@gmail.com',
+        userName: 'hahaha',
+        password: 'hashPassword',
+        thumb: [],
+        board: null,
+        createAt: new Date(),
+        updateAt: new Date(),
+        deleteAt: undefined,
+      };
+
+      mockUserRepository.findOne.mockImplementation((payload) => findUser);
+
+      //when
+      const result = await userService.tokenValidateUser(payload);
+
+      //then
+      expect(result.userName).toEqual(payload.userName);
+      expect(mockUserRepository.findOne).toHaveBeenCalledTimes(1);
     });
   });
 });
