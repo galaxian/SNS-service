@@ -234,5 +234,18 @@ describe('TagService', () => {
       expect(mockTagRepository.delete).toHaveBeenCalledTimes(tagList.length);
       expect(mockTagRepository.delete).toHaveBeenLastCalledWith(tagList[1].id);
     });
+    it('태그 없을 경우', async () => {
+      //given
+      const tagList: HashTag[] = [];
+
+      mockTagRepository.delete.mockResolvedValue(undefined);
+
+      //when
+      const result = await tagService.deleteTag(tagList);
+
+      //then
+      expect(result).toBeUndefined();
+      expect(mockTagRepository.delete).toHaveBeenCalledTimes(tagList.length);
+    });
   });
 });
