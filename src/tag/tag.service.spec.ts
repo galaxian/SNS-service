@@ -201,4 +201,38 @@ describe('TagService', () => {
       });
     });
   });
+
+  describe('deleteTag', () => {
+    it('태그 삭제 성공', async () => {
+      //given
+      const tagList: HashTag[] = [
+        {
+          id: 1,
+          tagName: '태그',
+          board: new Board(),
+          createAt: undefined,
+          updateAt: undefined,
+          deleteAt: undefined,
+        },
+        {
+          id: 2,
+          tagName: '해시',
+          board: new Board(),
+          createAt: undefined,
+          updateAt: undefined,
+          deleteAt: undefined,
+        },
+      ];
+
+      mockTagRepository.delete.mockResolvedValue(undefined);
+
+      //when
+      const result = await tagService.deleteTag(tagList);
+
+      //then
+      expect(result).toBeUndefined();
+      expect(mockTagRepository.delete).toHaveBeenCalledTimes(tagList.length);
+      expect(mockTagRepository.delete).toHaveBeenLastCalledWith(tagList[1].id);
+    });
+  });
 });
