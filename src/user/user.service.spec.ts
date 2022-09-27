@@ -242,5 +242,26 @@ describe('UserService', () => {
       //then
       expect(result.accessToken).toEqual(expect.any(String));
     });
+    it('로그인 가입 정보 없음', async () => {
+      //given
+      const input: SignInRequestDto = {
+        email: 'abcd1234@naver.com',
+        password: 'abcd1234>?',
+      };
+
+      mockUserRepository.findOne.mockImplementation(() => null);
+
+      //when
+
+      //then
+      expect(async () => {
+        await userService.signIn(input);
+      }).rejects.toThrowError(
+        new BadRequestException({
+          statusCode: 404,
+          message: '존재하지 않는 유저입니다.',
+        }),
+      );
+    });
   });
 });
