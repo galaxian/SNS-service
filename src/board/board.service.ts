@@ -176,6 +176,10 @@ export class BoardService {
       relations: ['user'],
     });
 
+    if (!findBoard) {
+      throw new NotFoundException('게시글이 존재하지 않습니다.');
+    }
+
     if (findBoard.user.id !== user.id) {
       throw new UnauthorizedException('본인 게시글만 삭제 할 수 있습니다.');
     }
