@@ -166,5 +166,39 @@ describe('TagService', () => {
         where: { board: { id: boardId } },
       });
     });
+    it('게시글의 태그 조회', async () => {
+      //given
+      const tagList: HashTag[] = [
+        {
+          id: 1,
+          tagName: '태그',
+          board: new Board(),
+          createAt: undefined,
+          updateAt: undefined,
+          deleteAt: undefined,
+        },
+        {
+          id: 2,
+          tagName: '해시',
+          board: new Board(),
+          createAt: undefined,
+          updateAt: undefined,
+          deleteAt: undefined,
+        },
+      ];
+      const boardId = 1;
+
+      mockTagRepository.find.mockReturnValue(tagList);
+
+      //when
+      const result: HashTag[] = await tagService.findTagListByBoardId(boardId);
+
+      //then
+      expect(result).toEqual(tagList);
+      expect(mockTagRepository.find).toHaveBeenCalledTimes(1);
+      expect(mockTagRepository.find).toHaveBeenCalledWith({
+        where: { board: { id: boardId } },
+      });
+    });
   });
 });
