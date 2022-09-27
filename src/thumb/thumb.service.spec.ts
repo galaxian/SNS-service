@@ -145,4 +145,21 @@ describe('ThumbService', () => {
       expect(mockThumbRepository.save).toHaveBeenCalledWith(thumb);
     });
   });
+
+  describe('countThumb', () => {
+    it('좋아요 수 조회 메서드', async () => {
+      //given
+      const countThumb = 3;
+      const input = 1;
+
+      mockThumbRepository.countBy.mockReturnValue(countThumb);
+
+      //when
+      const result: number = await thumbService.countThumb(input);
+
+      //then
+      expect(result).toEqual(countThumb);
+      expect(mockThumbRepository.countBy).toHaveBeenCalledTimes(1);
+    });
+  });
 });
