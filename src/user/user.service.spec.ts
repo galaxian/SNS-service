@@ -7,20 +7,15 @@ import { UserService } from './user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { BadRequestException } from '@nestjs/common';
-import { async } from 'rxjs';
+import { SignInRequestDto } from './dto/req/signin.req.dto';
 
 describe('UserService', () => {
   let userService: UserService;
   let jwtService: JwtService;
 
-  jest.mock('bcrypt', () => {
-    return {
-      genSalt: jest.fn(() => 'hash'),
-      hash: jest.fn(() => 'hashPassword'),
-    };
-  });
-
-  const mockJwtService = {};
+  const mockJwtService = {
+    sign: jest.fn(() => 'token'),
+  };
 
   const mockUserRepository = {
     create: jest.fn(),
@@ -121,9 +116,7 @@ describe('UserService', () => {
         deleteAt: undefined,
       };
 
-      mockUserRepository.findOne.mockImplementationOnce((email) => findUser);
-
-      mockUserRepository.findOne.mockImplementationOnce((userName) => null);
+      mockUserRepository.findOne.mockImplementation((email) => findUser);
 
       mockUserRepository.create.mockImplementation((input) => null);
 
@@ -195,9 +188,7 @@ describe('UserService', () => {
         checkPassword: 'sekdnfeee222',
       };
 
-      mockUserRepository.findOne.mockImplementationOnce((email) => null);
-
-      mockUserRepository.findOne.mockImplementationOnce((userName) => null);
+      mockUserRepository.findOne.mockImplementation((email) => null);
 
       mockUserRepository.create.mockImplementation((input) => null);
 
@@ -217,6 +208,39 @@ describe('UserService', () => {
       expect(mockUserRepository.findOne).toHaveBeenCalledTimes(0);
       expect(mockUserRepository.create).toHaveBeenCalledTimes(0);
       expect(mockUserRepository.save).toHaveBeenCalledTimes(0);
+    });
+  });
+
+  describe('signIn', () => {
+    it('로그인 성공', async () => {
+      //given
+      const input: SignInRequestDto = {
+        email: 'abcd1234@gmail.com',
+        password: 'abcd1234>?',
+      };
+
+      const findUser: User = {
+        id: 1,
+        email: 'abcd1234@gmail.com',
+        userName: 'hahahaha',
+        password: 'hashPassword',
+        thumb: [],
+        board: null,
+        createAt: new Date(),
+        updateAt: new Date(),
+        deleteAt: undefined,
+      };
+
+      mockUserRepository.findOne.mockImplementation((email) => findUser);
+
+      const bcryptCompare = jest.fn().mockResolvedValue(true);
+      (bcrypt.compare as jest.Mock) = bcryptCompare;
+
+      //when
+      const result = await userService.signIn(input);
+
+      //then
+      expect(result.accessToken).toEqual(expect.any(String));
     });
   });
 });
