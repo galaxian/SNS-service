@@ -162,4 +162,94 @@ describe('ThumbService', () => {
       expect(mockThumbRepository.countBy).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('thumbUpOrDown', () => {
+    it('좋아요 없을 시 생성', async () => {
+      //given
+      const board: Board = {
+        id: 1,
+        title: '',
+        content: '',
+        countThumbUp: 0,
+        views: 0,
+        thumb: [],
+        user: new User(),
+        hashTag: [],
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      const user: User = {
+        id: 1,
+        email: '',
+        userName: '',
+        password: '',
+        thumb: [],
+        board: new Board(),
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      mockThumbRepository.findOne.mockReturnValue(null);
+
+      //when
+      const result: boolean = await thumbService.thumbUpOrDown(board, user);
+
+      //then
+      expect(result).toBeTruthy();
+      expect(mockThumbRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockThumbRepository.create).toHaveBeenCalledTimes(1);
+      expect(mockThumbRepository.save).toHaveBeenCalledTimes(1);
+    });
+    it('좋아요 있을 시 변경', async () => {
+      //given
+      const board: Board = {
+        id: 1,
+        title: '',
+        content: '',
+        countThumbUp: 0,
+        views: 0,
+        thumb: [],
+        user: new User(),
+        hashTag: [],
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      const user: User = {
+        id: 1,
+        email: '',
+        userName: '',
+        password: '',
+        thumb: [],
+        board: new Board(),
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      const thumb: Thumb = {
+        id: 1,
+        user: user,
+        board: board,
+        isThumb: false,
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      mockThumbRepository.findOne.mockReturnValue(thumb);
+
+      //when
+      const result: boolean = await thumbService.thumbUpOrDown(board, user);
+
+      //then
+      expect(result).toBeTruthy();
+      expect(mockThumbRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockThumbRepository.save).toHaveBeenCalledTimes(1);
+    });
+  });
 });
