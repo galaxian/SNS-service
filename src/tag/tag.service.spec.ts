@@ -312,4 +312,23 @@ describe('TagService', () => {
       });
     });
   });
+
+  describe('restoreTag', () => {
+    it('태그 복구', async () => {
+      //given
+      const boardId = 1;
+
+      mockTagRepository.restore.mockReturnValue(undefined);
+
+      //when
+      const result = await tagService.restoreTag(boardId);
+
+      //then
+      expect(result).toBeUndefined();
+      expect(mockTagRepository.restore).toHaveBeenCalledTimes(1);
+      expect(mockTagRepository.restore).toHaveBeenCalledWith({
+        board: { id: boardId },
+      });
+    });
+  });
 });
