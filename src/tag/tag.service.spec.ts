@@ -147,4 +147,24 @@ describe('TagService', () => {
       expect(mockTagRepository.save).toHaveBeenCalledTimes(0);
     });
   });
+
+  describe('findTaglistByBoardId', () => {
+    it('DB에 태그 없을 경우', async () => {
+      //given
+      const tagList: HashTag[] = [];
+      const boardId = 1;
+
+      mockTagRepository.find.mockReturnValue(tagList);
+
+      //when
+      const result: HashTag[] = await tagService.findTagListByBoardId(boardId);
+
+      //then
+      expect(result).toEqual([]);
+      expect(mockTagRepository.find).toHaveBeenCalledTimes(1);
+      expect(mockTagRepository.find).toHaveBeenCalledWith({
+        where: { board: { id: boardId } },
+      });
+    });
+  });
 });
