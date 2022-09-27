@@ -469,5 +469,39 @@ describe('BoardService', () => {
       expect(mockBoardRepository.softDelete).toHaveBeenCalledTimes(1);
       expect(mockBoardRepository.softDelete).toHaveBeenCalledWith(boardId);
     });
+    it('게시글 notFound', async () => {
+      //given
+      const boardId = 1;
+
+      const user: User = {
+        id: 1,
+        email: '',
+        userName: '',
+        password: '',
+        thumb: [],
+        board: new Board(),
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      mockBoardRepository.findOne.mockReturnValue(null);
+
+      //when
+
+      //then
+      expect(async () => {
+        await boardService.softDeleteBoard(boardId, user);
+      }).rejects.toThrowError(
+        new NotFoundException('게시글이 존재하지 않습니다.'),
+      );
+      expect(mockBoardRepository.findOne).toHaveBeenCalledTimes(1);
+      expect(mockBoardRepository.findOne).toHaveBeenCalledWith({
+        where: { id: boardId },
+        relations: ['user'],
+      });
+      expect(mockTagService.softDeleteTag).toHaveBeenCalledTimes(0);
+      expect(mockBoardRepository.softDelete).toHaveBeenCalledTimes(0);
+    });
   });
 });
