@@ -31,13 +31,14 @@ export class UserService {
     const findUserByEmail = await this.userRepository.findOne({
       where: { email },
     });
-    const findUserByUserName = await this.userRepository.findOne({
-      where: { userName },
-    });
 
     if (findUserByEmail) {
       throw new BadRequestException('이미 존재하는 이메일입니다.');
     }
+
+    const findUserByUserName = await this.userRepository.findOne({
+      where: { userName },
+    });
 
     if (findUserByUserName) {
       throw new BadRequestException('이미 존재하는 닉네임입니다.');

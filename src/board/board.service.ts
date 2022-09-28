@@ -40,7 +40,9 @@ export class BoardService {
 
     const saveBoard: Board = await this.boardRepository.save(board);
 
-    await this.tagService.saveTag(saveBoard.id, hashTag);
+    if (hashTag) {
+      await this.tagService.saveTag(saveBoard.id, hashTag);
+    }
 
     return { id: saveBoard.id };
   }
@@ -110,6 +112,10 @@ export class BoardService {
       relations: ['user', 'hashTag'],
     });
 
+    if (!findBoard) {
+      throw new NotFoundException('존재하지 않는 게시글입니다.');
+    }
+
     const tagList: string[] = [];
     const tags: HashTag[] = findBoard.hashTag;
     tags.forEach((tag) => {
@@ -170,11 +176,15 @@ export class BoardService {
       relations: ['user'],
     });
 
+    if (!findBoard) {
+      throw new NotFoundException('게시글이 존재하지 않습니다.');
+    }
+
     if (findBoard.user.id !== user.id) {
       throw new UnauthorizedException('본인 게시글만 삭제 할 수 있습니다.');
     }
 
-    await this.tagService.softDelteTag(id);
+    await this.tagService.softDeleteTag(id);
 
     const result = await this.boardRepository.softDelete(id);
 
