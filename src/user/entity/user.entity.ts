@@ -8,13 +8,13 @@ export class User extends TimeStampableEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar', unique: true })
   email: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 14, unique: true })
   userName: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 100 })
   password: string;
 
   @OneToMany(() => Thumb, (thumb) => thumb.user, { eager: false })
