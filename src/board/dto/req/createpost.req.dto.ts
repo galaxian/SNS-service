@@ -1,15 +1,25 @@
-import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CreateBoardRequestDto {
   @IsNotEmpty()
   @IsString()
-  title: string;
+  @MaxLength(20)
+  readonly title: string;
 
   @IsNotEmpty()
   @IsString()
-  content: string;
+  @MaxLength(200)
+  readonly content: string;
 
   @IsOptional()
   @IsString()
-  hashTag?: string;
+  @MaxLength(30)
+  @MinLength(2)
+  readonly hashTag?: string;
 }
