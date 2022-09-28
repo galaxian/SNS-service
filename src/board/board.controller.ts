@@ -14,6 +14,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthGuard } from 'src/user/security/auth.guard';
 import { ResponseDto } from 'src/util/dto/response.dto';
@@ -22,10 +23,15 @@ import { CreateBoardRequestDto } from './dto/req/createpost.req.dto';
 import { GetDetailBoardResponseDto } from './dto/res/getdetailPost.res.dto';
 import { GetAllBoardResponseDto } from './dto/res/getpost.res.dto';
 
+@ApiTags('게시글 관련 api')
 @Controller({ path: '/boards', version: ['1'] })
 export class BoardController {
   constructor(private readonly boardService: BoardService) {}
 
+  @ApiOperation({
+    summary: '게시글 작성 api',
+    description: '인증된 사용자에 한해 게시글을 작성할 수 있는 api',
+  })
   @Post()
   @UsePipes(ValidationPipe)
   @UseGuards(AuthGuard)
@@ -41,6 +47,11 @@ export class BoardController {
     };
   }
 
+  @ApiOperation({
+    summary: '게시글 목록 조회 api',
+    description:
+      '정렬, 페이징, 검색 기능을 포함하여 게시글 목록을 조회 하는 api',
+  })
   @Get()
   @UsePipes(ValidationPipe)
   async getAllBoard(
@@ -63,6 +74,10 @@ export class BoardController {
     };
   }
 
+  @ApiOperation({
+    summary: '게시글 상세 조회 api',
+    description: '게시글 pk를 사용하여 게시글을 상세 조회 하는 api',
+  })
   @Get('/:id')
   @UsePipes(ValidationPipe)
   async getDetailBoard(
@@ -76,6 +91,10 @@ export class BoardController {
     };
   }
 
+  @ApiOperation({
+    summary: '게시글 수정 api',
+    description: '본인의 게시글인지 확인 후 게시글을 수정하는 api',
+  })
   @Put('/:id')
   @UsePipes(ValidationPipe)
   @UseGuards(AuthGuard)
@@ -92,6 +111,10 @@ export class BoardController {
     };
   }
 
+  @ApiOperation({
+    summary: '게시글 삭제 api',
+    description: '본인의 게시글인지 확인 후 게시글을 삭제하는 api',
+  })
   @Delete('/:id')
   @UsePipes(ValidationPipe)
   @UseGuards(AuthGuard)
@@ -106,6 +129,10 @@ export class BoardController {
     };
   }
 
+  @ApiOperation({
+    summary: '게시글 복구 api',
+    description: '본인의 게시글인지 확인 후 삭제한 게시글을 복구하는 api',
+  })
   @Put('/restore/:id')
   @UsePipes(ValidationPipe)
   @UseGuards(AuthGuard)
@@ -121,6 +148,10 @@ export class BoardController {
     };
   }
 
+  @ApiOperation({
+    summary: '게시글 좋아요 api',
+    description: '게시글에 좋아요 또는 좋아요 취소 기능을 하는 api',
+  })
   @Put('/:id/thumbs')
   @UsePipes(ValidationPipe)
   @UseGuards(AuthGuard)
