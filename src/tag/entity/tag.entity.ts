@@ -7,7 +7,7 @@ export class HashTag extends TimeStampableEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar' })
   tagName: string;
 
   @ManyToOne(() => Board, (board) => board.hashTag, { eager: false })

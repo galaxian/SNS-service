@@ -14,6 +14,6 @@ export class Thumb extends TimeStampableEntity {
   @ManyToOne(() => Board, (board) => board.thumb, { eager: false })
   board: Board;
 
-  @Column({ default: true })
+  @Column({ type: 'boolean', default: true })
   isThumb: boolean;
 }

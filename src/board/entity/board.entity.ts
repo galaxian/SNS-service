@@ -15,16 +15,16 @@ export class Board extends TimeStampableEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 25 })
   title: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 50 })
   content: string;
 
-  @Column({ default: 0 })
+  @Column({ type: 'int', default: 0 })
   countThumbUp: number;
 
-  @Column({ default: 0 })
+  @Column({ type: 'int', default: 0 })
   views: number;
 
   @OneToMany(() => Thumb, (thumb) => thumb.board, { eager: false })
