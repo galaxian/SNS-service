@@ -27,7 +27,10 @@ describe('BoardService', () => {
     restoreTag: jest.fn(),
   };
 
-  const mockThumbService = {};
+  const mockThumbService = {
+    thumbUpOrDown: jest.fn(),
+    countThumb: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -48,6 +51,8 @@ describe('BoardService', () => {
     mockTagService.saveTag.mockClear();
     mockTagService.updateTag.mockClear();
     mockTagService.softDeleteTag.mockClear();
+    mockThumbService.countThumb.mockClear();
+    mockThumbService.thumbUpOrDown.mockClear();
   });
 
   it('should be defined', () => {
@@ -619,6 +624,51 @@ describe('BoardService', () => {
       expect(mockBoardRepository.restore).toHaveBeenCalledWith(boardId);
       expect(mockTagService.restoreTag).toHaveBeenCalledTimes(1);
       expect(mockTagService.restoreTag).toHaveBeenCalledWith(boardId);
+    });
+  });
+
+  describe('thumbUpOrDown', () => {
+    it('좋아요 성공', async () => {
+      //given
+      const boardId = 1;
+      const user: User = {
+        id: 1,
+        email: '',
+        userName: '',
+        password: '',
+        thumb: [],
+        board: new Board(),
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      const findBoard: Board = {
+        id: 1,
+        title: '',
+        content: '',
+        countThumbUp: 0,
+        views: 0,
+        thumb: [],
+        user: new User(),
+        hashTag: [],
+        createAt: undefined,
+        updateAt: undefined,
+        deleteAt: undefined,
+      };
+
+      mockThumbService.thumbUpOrDown.mockReturnValue(true);
+      mockThumbService.countThumb.mockReturnValue(findBoard.countThumbUp);
+      mockBoardRepository.save.mockReturnValue(findBoard);
+
+      //when
+      const result = await boardService.thumbUpOrDown(boardId, user);
+
+      //then
+      expect(result.isThumb).toBeTruthy();
+      expect(mockBoardRepository.save).toHaveBeenCalledTimes(1);
+      expect(mockThumbService.thumbUpOrDown).toHaveBeenCalledTimes(1);
+      expect(mockThumbService.countThumb).toHaveBeenCalledTimes(1);
     });
   });
 });
