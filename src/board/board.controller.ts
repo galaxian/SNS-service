@@ -14,7 +14,7 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Request } from 'express';
 import { AuthGuard } from 'src/user/security/auth.guard';
 import { ResponseDto } from 'src/util/dto/response.dto';
@@ -32,6 +32,7 @@ export class BoardController {
     summary: '게시글 작성 api',
     description: '인증된 사용자에 한해 게시글을 작성할 수 있는 api',
   })
+  @ApiBearerAuth('access-token')
   @Post()
   @UsePipes(ValidationPipe)
   @UseGuards(AuthGuard)
@@ -95,6 +96,7 @@ export class BoardController {
     summary: '게시글 수정 api',
     description: '본인의 게시글인지 확인 후 게시글을 수정하는 api',
   })
+  @ApiBearerAuth('access-token')
   @Put('/:id')
   @UsePipes(ValidationPipe)
   @UseGuards(AuthGuard)
@@ -115,6 +117,7 @@ export class BoardController {
     summary: '게시글 삭제 api',
     description: '본인의 게시글인지 확인 후 게시글을 삭제하는 api',
   })
+  @ApiBearerAuth('access-token')
   @Delete('/:id')
   @UsePipes(ValidationPipe)
   @UseGuards(AuthGuard)
@@ -133,6 +136,7 @@ export class BoardController {
     summary: '게시글 복구 api',
     description: '본인의 게시글인지 확인 후 삭제한 게시글을 복구하는 api',
   })
+  @ApiBearerAuth('access-token')
   @Put('/restore/:id')
   @UsePipes(ValidationPipe)
   @UseGuards(AuthGuard)
@@ -152,6 +156,7 @@ export class BoardController {
     summary: '게시글 좋아요 api',
     description: '게시글에 좋아요 또는 좋아요 취소 기능을 하는 api',
   })
+  @ApiBearerAuth('access-token')
   @Put('/:id/thumbs')
   @UsePipes(ValidationPipe)
   @UseGuards(AuthGuard)
